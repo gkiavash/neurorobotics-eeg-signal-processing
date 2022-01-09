@@ -64,7 +64,4 @@ power_delta = trapz(X,Y);
 %% Topo-plot
 
 figure("Name", 'TOPO, PSD, 1,4')
-topoplot(power_delta, EEG.chanlocs, 'style', 'both', 'electrodes', 'labelpoint');
-title('Power in DELTA band [1-4] Hz')
-colormap('jet')
-colorbar
+topoplot(EEG.data)
