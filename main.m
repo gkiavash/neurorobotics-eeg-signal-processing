@@ -8,18 +8,17 @@ resting_pre = load("resting_pre.mat");
 num_of_secs = 30;
 num_of_channels = 1;
 
-%resting_post_plot = resting_post.EEG_import(1:num_of_channels, 1:num_of_secs*resting_post.fs).';
-
 %figure
-%plot(resting_post_plot)
+%plot(resting_post.EEG_import(1:num_of_channels, 1:num_of_secs*resting_post.fs).')
 
 size_ = size(resting_post.EEG_import);
 fs = resting_post.fs;
 bandpass_low_fc = 1;
-bandpass_high_fc = 20;
-%%
-figure('Name', 'Before filtfilt')
-plot(resting_post.EEG_import(1, 1:num_of_secs*resting_post.fs))
+bandpass_high_fc = 30;
+
+%% Filtering
+%figure('Name', 'Before filtfilt')
+%plot(resting_post.EEG_import(1, 1:num_of_secs*resting_post.fs))
 
 pxx = pwelch(resting_post.EEG_import(1,:));
 figure('Name', 'PSD')
@@ -30,9 +29,9 @@ for idx = 1:size_(1)
     resting_post.EEG_import(idx, :) = filtfilt(b, a, resting_post.EEG_import(idx, :));
 end
 
-figure('Name', 'After filtfilt')
-plot(resting_post.EEG_import(1, 1:num_of_secs*resting_post.fs))
-%%
+%figure('Name', 'After filtfilt')
+%plot(resting_post.EEG_import(1, 1:num_of_secs*resting_post.fs))
+%% Import EEG
 
 EEG = pop_importdata('setname', 'n1', 'data', resting_post.EEG_import, 'srate', resting_post.fs, 'chanlocs', 'gtech_64.sfp');
 
@@ -54,17 +53,23 @@ xlabel('Hz')
 ylabel('PSD [\mu V^2 /Hz]')
 %% Power
 
-f1_delta = find(f >= 1, 1, 'first');
-f2_delta = find(f >= 4, 1, 'first');
+f_topo = [1 4; 4 8; 8 13; 13 30];
+for i=1:size(f_topo, 1)
+    f1_delta = find(f >= f_topo(i, 1), 1, 'first');
+    f2_delta = find(f >= f_topo(i, 2), 1, 'first');
+    
+    X = f(f1_delta:f2_delta);
+    Y = pxx(f1_delta:f2_delta, :);
+    
+    power_delta = trapz(X,Y);
 
-X = f(f1_delta:f2_delta);
-Y = pxx(f1_delta:f2_delta, :);
+    figure("Name", sprintf('TOPO, PSD, %f %f', f_topo(i, 1), f_topo(i, 2)))
+    topoplot(power_delta, EEG.chanlocs, 'style', 'both', 'electrodes', 'labelpoint');
+    title(sprintf('Power in DELTA band [%f %f] Hz', f_topo(i, 1), f_topo(i, 2)))
+    colormap('jet')
+    colorbar
+end
 
-power_delta = trapz(X,Y);
+
 %% Topo-plot
 
-figure("Name", 'TOPO, PSD, 1,4')
-topoplot(power_delta, EEG.chanlocs, 'style', 'both', 'electrodes', 'labelpoint');
-title('Power in DELTA band [1-4] Hz')
-colormap('jet')
-colorbar
