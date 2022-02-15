@@ -6,8 +6,8 @@ addpath('C:\Program Files\MATLAB\R2021b\toolbox\eeglab2021.1')
 % eeglab;
 
 %% Variables
-resting_post = load("resting_post.mat");
-resting_pre = load("resting_pre.mat");
+resting_post = load("data/resting_post.mat");
+resting_pre = load("data/resting_pre.mat");
 
 num_of_secs = 30;
 num_of_channels = 4;
@@ -30,8 +30,8 @@ filtered_post = filtfilt(b, a, resting_post.EEG_import');
 
 filtered_pre = filtered_pre';
 filtered_post = filtered_post';
-save('filtered_pre.mat','filtered_pre')
-save('filtered_post.mat','filtered_post')
+save('data/filtered_pre.mat','filtered_pre')
+save('data/filtered_post.mat','filtered_post')
 
 %% Plot
 figure()

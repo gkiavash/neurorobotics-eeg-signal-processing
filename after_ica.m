@@ -5,9 +5,8 @@ close all;
 addpath('C:\Program Files\MATLAB\R2021b\toolbox\eeglab2021.1')
 eeglab;
 
-EEG_pre = pop_loadset('ica_pre.set');
-EEG_post = pop_loadset('ica_post.set');
-
+EEG_pre = pop_loadset('data/ica_pre.set');
+EEG_post = pop_loadset('data/ica_post.set');
 %% PSD
 fs = EEG_pre.srate;
 
@@ -16,14 +15,6 @@ window = 1*fs;
 noverlap = 0.5*fs;
 [pxx_pre, f_pre] = pwelch(EEG_pre.data', window, noverlap, frequency, fs);
 [pxx_post, f_post] = pwelch(EEG_post.data', window, noverlap, frequency, fs);
-
-
-% See difference between FFT and pwelch:
-%Fs = 80;
-%t = 0:1/Fs:1-1/Fs;
-% Test simple FFT with simple function
-%x = cos(2*pi*100*t)+randn(size(t));
-%plot(psd(spectrum.periodogram, EEG_pre.data', 'Fs', 80, 'NFFT', length(EEG_pre.data')));
 
 %% Visualize
 visualize_after_ica(EEG_pre, pxx_pre, f_pre)
